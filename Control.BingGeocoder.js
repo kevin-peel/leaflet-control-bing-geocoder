@@ -1,14 +1,20 @@
+var queryTerm = "";
+
 L.Control.BingGeocoder = L.Control.extend({
 	options: {
 		collapsed: true,
-		position: 'topright',
-		text: 'Locate',
+		position: 'topleft',
+		text: 'Search Address',
 		callback: function (results) {
 			var bbox = results.resourceSets[0].resources[0].bbox,
 				first = new L.LatLng(bbox[0], bbox[1]),
 				second = new L.LatLng(bbox[2], bbox[3]),
 				bounds = new L.LatLngBounds([first, second]);
 			this._map.fitBounds(bounds);
+			//This stuff adds a marker to the map with a popup showing the text typed in
+			var latLngCtr = bounds.getCenter();
+			var locnMarker;
+			locnMarker = new L.marker(latLngCtr).addTo(map).bindPopup(queryTerm).openPopup();
 		}
 	},
 
@@ -30,9 +36,10 @@ L.Control.BingGeocoder = L.Control.extend({
 
 		var input = this._input = document.createElement('input');
 		input.type = "text";
+		input.placeholder = "Search by address or postal code"; //Change this to change text inside of box
 
 		var submit = document.createElement('button');
-		submit.type = "submit";
+		//submit.type = "submit"; //REMOVED THIS LINE SO THAT IT WORKS IN INTERNET EXPLORER 8
 		submit.innerHTML = this.options.text;
 
 		form.appendChild(input);
@@ -64,7 +71,9 @@ L.Control.BingGeocoder = L.Control.extend({
 		L.DomEvent.preventDefault(event);
 		this._callbackId = "_l_binggeocoder_" + (this._callbackId++);
 		window[this._callbackId] = L.Util.bind(this.options.callback, this);
-
+		
+		queryTerm = this._input.value;
+		
 		var params = {
 			query: this._input.value,
 			key : this.key,
