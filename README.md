@@ -4,12 +4,20 @@ Leaflet Control Bing Geocoder
 This is a fork of the leaflet-control-bing-geocoder with some modifications to suit my needs.  I'm not the greatest coder, but it seems to work.  Some of my changes might be fixed in the future.
 
 # What is it ?
-A simple geocoder that uses Bing to locate places.
+A simple geocoder plugin for Leaflet that uses Bing to locate places.
+
+Requires:
+Leaflet library - <a href="http://leafletjs.com">Leaflet website</a>
 
 Changes from the original repository:
 * Works in Internet Explorer 7+, but better in 8+
 * Button style updated to match Leaflet 0.7
+* Places a marker on the location and has a popup with the user's input
 * Some things here and there
+
+To do:
+* Only have one marker on map at a time (i.e. if two searches are made, the second search clears the first marker)
+* Clean up code a little
 
 # How to use it ?
 ```javascript
