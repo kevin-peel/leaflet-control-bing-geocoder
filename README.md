@@ -32,3 +32,9 @@ var options = {
     }
 };
 ```
+
+# Browser Support
+* IE7+
+* Firefox
+* Chrome
+* Other Gecko and WebKit-based layout engines
