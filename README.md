@@ -1,8 +1,15 @@
 Leaflet Control Bing Geocoder
 =============================
 
+This is a fork of the leaflet-control-bing-geocoder with some modifications to suit my needs.  I'm not the greatest coder, but it seems to work.  Some of my changes might be fixed in the future.
+
 # What is it ?
 A simple geocoder that uses Bing to locate places.
+
+Changes from the original repository:
+* Works in Internet Explorer 7+, but better in 8+
+* Button style updated to match Leaflet 0.7
+* Some things here and there
 
 # How to use it ?
 ```javascript
