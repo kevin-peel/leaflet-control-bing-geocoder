@@ -12,12 +12,11 @@ Leaflet library - <a href="http://leafletjs.com">Leaflet website</a>
 Changes from the original repository:
 * Works in Internet Explorer 7+, but better in 8+
 * Button style updated to match Leaflet 0.7
-* Places a marker on the location and has a popup with the user's input
+* Places a marker on the location and has a popup with the user's input (only the latest search is shown)
 * Some things here and there
 
 To do:
-* Only have one marker on map at a time (i.e. if two searches are made, the second search clears the first marker)
-* Clean up code a little
+* Donno yet
 
 # How to use it ?
 ```javascript
