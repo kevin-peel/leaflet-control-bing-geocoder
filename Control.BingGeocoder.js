@@ -1,20 +1,22 @@
 var queryTerm = "";
+var locnGroup = new L.featureGroup();
 
 L.Control.BingGeocoder = L.Control.extend({
 	options: {
-		collapsed: true,
-		position: 'topleft',
-		text: 'Search Address',
+		collapsed: false, /* Whether its collapsed or not */
+		position: 'topright', /* The position of the control */
+		text: 'Search', /* The text of the submit button */
 		callback: function (results) {
 			var bbox = results.resourceSets[0].resources[0].bbox,
 				first = new L.LatLng(bbox[0], bbox[1]),
 				second = new L.LatLng(bbox[2], bbox[3]),
 				bounds = new L.LatLngBounds([first, second]);
 			this._map.fitBounds(bounds);
-			//This stuff adds a marker to the map with a popup showing the text typed in
+
 			var latLngCtr = bounds.getCenter();
-			var locnMarker;
-			locnMarker = new L.marker(latLngCtr).addTo(map).bindPopup(queryTerm).openPopup();
+			locnGroup.clearLayers();
+			var locnMarker = new L.marker(latLngCtr).addTo(locnGroup).bindPopup(queryTerm);
+			locnGroup.addTo(map).openPopup();
 		}
 	},
 
@@ -34,28 +36,24 @@ L.Control.BingGeocoder = L.Control.extend({
 
 		var form = this._form = L.DomUtil.create('form', className + '-form');
 
-		var input = this._input = document.createElement('input');
-		input.type = "text";
+		var input = this._input = L.DomUtil.create('input', className + '-input', form);
+		input.type = 'text';
 		input.placeholder = "Search by address or postal code"; //Change this to change text inside of box
 
-		var submit = document.createElement('button');
-		//submit.type = "submit"; //REMOVED THIS LINE SO THAT IT WORKS IN INTERNET EXPLORER 8
-		submit.innerHTML = this.options.text;
-
-		form.appendChild(input);
+		var submit = this._createButton(className, this.options.text);
 		form.appendChild(submit);
 
-		L.DomEvent.addListener(form, 'submit', this._geocode, this);
+		L.DomEvent.on(form, 'submit', this._geocode, this);
 
 		if (this.options.collapsed) {
-			L.DomEvent.addListener(container, 'mouseover', this._expand, this);
-			L.DomEvent.addListener(container, 'mouseout', this._collapse, this);
+			L.DomEvent.on(container, 'mouseover', this._expand, this);
+			L.DomEvent.on(container, 'mouseout', this._collapse, this);
 
 			var link = this._layersLink = L.DomUtil.create('a', className + '-toggle', container);
 			link.href = '#';
 			link.title = 'Bing Geocoder';
 
-			L.DomEvent.addListener(link, L.Browser.touch ? 'click' : 'focus', this._expand, this);
+			L.DomEvent.on(link, L.Browser.touch ? 'click' : 'focus', this._expand, this);
 
 			this._map.on('movestart', this._collapse, this);
 		} else {
@@ -67,25 +65,33 @@ L.Control.BingGeocoder = L.Control.extend({
 		return container;
 	},
 
+	_createButton: function(css, text) {
+		var btn = '<button type="submit" class="' + css + '-button" />' + text + '</button>';
+
+		var radioFragment = document.createElement('div');
+		radioFragment.innerHTML = btn;
+
+		return radioFragment.firstChild;
+	},
+
 	_geocode : function (event) {
 		L.DomEvent.preventDefault(event);
-		this._callbackId = "_l_binggeocoder_" + (this._callbackId++);
+		this._callbackId = '_l_binggeocoder_' + (this._callbackId++);
 		window[this._callbackId] = L.Util.bind(this.options.callback, this);
 		
 		queryTerm = this._input.value;
-		
+
 		var params = {
 			query: this._input.value,
 			key : this.key,
 			jsonp : this._callbackId
 		},
-		url = "http://dev.virtualearth.net/REST/v1/Locations" + L.Util.getParamString(params),
-		script = document.createElement("script");
+		url = 'http://dev.virtualearth.net/REST/v1/Locations' + L.Util.getParamString(params),
+		script = L.DomUtil.create('script', '', document.getElementsByTagName('head')[0]);
 
-		script.type = "text/javascript";
+		script.type = 'text/javascript';
 		script.src = url;
 		script.id = this._callbackId;
-		document.getElementsByTagName("head")[0].appendChild(script);
 	},
 
 	_expand: function () {
@@ -93,6 +99,10 @@ L.Control.BingGeocoder = L.Control.extend({
 	},
 
 	_collapse: function () {
-		this._container.className = this._container.className.replace(' leaflet-control-geocoder-expanded', '');
+		L.DomUtil.removeClass(this._container, 'leaflet-control-geocoder-expanded');
 	}
 });
+
+L.control.bingGeocoder = function (key, options) {
+		return new L.Control.BingGeocoder(key, options);
+};
